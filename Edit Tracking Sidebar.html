@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.min.css">
+  <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+  <style>
+    :root {
+      /* Custom Color Palette */
+      --primary-color: #4285F4; /* Google Blue, but adjustable */
+      --secondary-color: #DB4437; /* Google Red, for accents like end job */
+      --background-light: #F8F9FA; /* Off-white / very light gray */
+      --surface-color: #FFFFFF; /* White for cards */
+      --text-dark: #343A40; /* Dark gray for primary text */
+      --text-medium: #6C757D; /* Medium gray for labels/secondary text */
+      --border-color: #E0E0E0; /* Light gray for borders */
+      --success-bg: #D4EDDA;
+      --success-text: #155724;
+      --error-bg: #F8D7DA;
+      --error-text: #721C24;
+      --warning-bg: #FFF3CD; /* New: for paused state */
+      --warning-text: #856404; /* New: for paused state */
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 15px; /* Increased padding */
+      background-color: var(--background-light);
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+
+    .mdl-card {
+      width: 100%;
+      margin-bottom: 25px; /* Increased margin between cards */
+      border-radius: 8px; /* Rounded corners */
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Softer, larger shadow */
+      background-color: var(--surface-color);
+      box-sizing: border-box; /* Ensure padding is included in width */
+      overflow: hidden; /* Ensures rounded corners are visible for title */
+    }
+
+    .mdl-card__title {
+      color: var(--surface-color);
+      background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); /* Subtle gradient */
+      font-size: 22px; /* Slightly larger title */
+      font-weight: 600;
+      padding: 20px; /* More padding */
+      /* No need for border-radius here, as overflow: hidden on parent takes care of it */
+    }
+
+    .mdl-card__supporting-text {
+      width: auto;
+      padding: 20px; /* More padding */
+      display: flex;
+      flex-direction: column;
+      /* gap property is fine, but we'll use margin-bottom on elements for robustness */
+    }
+
+    .mdl-textfield, .mdl-selectfield {
+      width: 100%;
+      padding: 0;
+      margin: 0 0 20px 0; /* Increased margin-bottom for consistent spacing */
+    }
+    /* Remove margin from the last item in the form to prevent excess space */
+    .mdl-card__supporting-text form > *:last-child {
+        margin-bottom: 0;
+    }
+    /* Exception for the button bar, which will have its own margin-top */
+    .mdl-card__supporting-text .button-bar {
+        margin-bottom: 0;
+    }
+
+
+    /* Custom styles to make MDL textfields less "Google-y" and prevent overlap */
+    .mdl-textfield__input {
+      border: none; /* Remove all default borders */
+      border-bottom: none; /* Explicitly remove the bottom border */
+      padding: 20px 0 12px 0; /* Consistent padding */
+      font-size: 16px;
+      line-height: 1.5; /* Explicit line-height */
+      color: var(--text-dark);
+      width: 100%; /* Ensure it takes full width */
+      box-sizing: border-box; /* Include padding in width */
+    }
+    .mdl-textfield__label {
+      color: var(--text-medium);
+      font-size: 14px;
+      top: 20px; /* Adjust label position to align with new input padding */
+    }
+    .mdl-textfield__input:focus {
+      border-bottom: none; /* Ensure no border appears on focus either */
+      box-shadow: none;
+      outline: none; /* Remove default outline */
+    }
+    .mdl-textfield--floating-label.is-focused .mdl-textfield__label,
+    .mdl-textfield--floating-label.is-dirty .mdl-textfield__label,
+    .mdl-textfield--floating-label.has-placeholder .mdl-textfield__label {
+      color: var(--primary-color);
+      font-size: 12px; /* Smaller when floating */
+      top: 0; /* Move to the top when floating */
+    }
+    .mdl-textfield__error {
+        font-size: 12px;
+        margin-top: 4px;
+        color: var(--error-text);
+    }
+
+
+    /* Custom styling for select elements to look like textfields and prevent overlap */
+    .mdl-selectfield {
+        position: relative;
+        display: block;
+        padding-top: 20px; /* Space for the floating label */
+        border-bottom: none; /* Remove bottom border from select fields */
+        margin-bottom: 20px; /* Consistent margin with textfields */
+    }
+    .mdl-selectfield select {
+        width: calc(100% - 24px); /* Account for custom arrow */
+        padding: 10px 0 10px 0; /* Adjusted vertical padding for selects */
+        border: none;
+        background-color: transparent;
+        margin: 0;
+        outline: none;
+        font-size: 16px;
+        font-weight: 400;
+        color: var(--text-dark);
+        -webkit-appearance: none; /* Remove default arrow on select */
+        -moz-appearance: none;
+        appearance: none;
+        cursor: pointer;
+        box-sizing: border-box; /* Include padding in width */
+    }
+    .mdl-selectfield:after { /* Custom arrow for select */
+        content: '\25BC'; /* Unicode for solid downward triangle */
+        position: absolute;
+        right: 0;
+        top: 50%; /* Center vertically based on new padding */
+        transform: translateY(-20%); /* Adjust to look centered above the line */
+        font-size: 14px;
+        color: var(--text-medium);
+        pointer-events: none;
+    }
+    .mdl-selectfield label { /* Label positioning */
+        color: var(--text-medium);
+        font-size: 14px;
+        position: absolute;
+        top: 0; /* Position at the very top */
+        left: 0;
+        transition-duration: .15s;
+        transition-timing-function: cubic-bezier(.4,0,.2,1);
+    }
+    .mdl-selectfield select:focus + label {
+        color: var(--primary-color);
+    }
+
+
+    .mdl-checkbox {
+        margin-top: 15px;
+        margin-bottom: 20px; /* Consistent margin with other elements */
+        font-size: 16px;
+        line-height: 1.2; /* Better vertical alignment */
+    }
+    .mdl-checkbox__label {
+      color: var(--text-dark);
+    }
+    .mdl-checkbox.is-checked .mdl-checkbox__box-outline,
+    .mdl-checkbox.is-checked .mdl-checkbox__tick-outline {
+        border-color: var(--primary-color); /* Checkbox color */
+    }
+
+    .button-bar {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 25px; /* More space above buttons */
+    }
+    .button-bar .mdl-button {
+      flex: 1;
+      text-align: center;
+      padding: 12px 18px; /* Larger buttons */
+      height: auto; /* Allow padding to define height */
+      border-radius: 6px; /* Slightly rounded buttons */
+      font-weight: 600; /* Bolder button text */
+      font-size: 15px;
+      text-transform: capitalize; /* More natural button text */
+      transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Smooth transitions */
+    }
+    .mdl-button--colored {
+      background-color: var(--primary-color);
+      color: var(--surface-color);
+    }
+    .mdl-button--colored.mdl-button--raised:hover {
+      background-color: #3B7ADF; /* Darker primary on hover */
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    .mdl-button--colored.mdl-button--raised:active {
+      background-color: #316BBF; /* Even darker primary on active */
+    }
+    .mdl-button--accent {
+      background-color: var(--secondary-color);
+      color: var(--surface-color);
+    }
+    .mdl-button--accent.mdl-button--raised:hover {
+      background-color: #C83329; /* Darker secondary on hover */
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    .mdl-button--accent.mdl-button--raised:active {
+      background-color: #B12B22; /* Even darker secondary on active */
+    }
+    /* Default button style (Resume Job) */
+    .mdl-button--raised:not(.mdl-button--colored):not(.mdl-button--accent) {
+      background-color: var(--surface-color);
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+    }
+    .mdl-button--raised:not(.mdl-button--colored):not(.mdl-button--accent):hover {
+        background-color: #E6EEF9; /* Light blue on hover */
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    }
+    .mdl-button--raised:not(.mdl-button--colored):not(.mdl-button--accent):active {
+        background-color: #D6E4F8; /* Even lighter blue on active */
+    }
+    /* Style for Pause button */
+    .mdl-button--pause {
+      background-color: #FFA000; /* Orange-ish for pause */
+      color: var(--surface-color);
+    }
+    .mdl-button--pause.mdl-button--raised:hover {
+      background-color: #E69100;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    .mdl-button--pause.mdl-button--raised:active {
+      background-color: #CC8400;
+    }
+
+
+    #activeJobDisplay {
+      padding: 20px;
+      margin-top: 25px; /* Consistent with other card margins */
+      background-color: var(--surface-color); /* White background for active job card */
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    #activeJobDisplay .mdl-card__title {
+      background: linear-gradient(135deg, #34A853 0%, #4285F4 100%); /* Green/blue gradient */
+    }
+    #activeJobDisplay .mdl-card__supporting-text {
+        padding-top: 15px; /* Slightly less top padding in this section */
+        /* gap property is fine, but we'll use margin-bottom on elements for robustness */
+    }
+    #activeJobDisplay p {
+      margin: 5px 0; /* More spacing */
+      font-size: 1em;
+      color: var(--text-dark);
+    }
+    #activeJobDisplay p strong {
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+    #activeJobDisplay .timer {
+      font-weight: 700; /* Bolder timer */
+      font-size: 1.8em; /* Larger timer */
+      color: var(--secondary-color); /* Red for timer */
+      display: block; /* Ensure it takes full line */
+      margin-top: 15px; /* More space above timer */
+      margin-bottom: 20px; /* Space below timer */
+      text-align: center;
+    }
+    #activeJobStatus { /* Style for displaying job status */
+      font-weight: 600;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border-radius: 5px;
+      text-align: center;
+    }
+    #activeJobStatus.status-open {
+      background-color: rgba(52, 168, 83, 0.1); /* Light green */
+      color: #34A853; /* Darker green */
+    }
+    #activeJobStatus.status-paused {
+      background-color: var(--warning-bg); /* Light yellow/orange */
+      color: var(--warning-text); /* Darker yellow/orange */
+    }
+    .hidden {
+      display: none;
+    }
+    #feedback {
+      margin-top: 25px; /* Consistent margin */
+      padding: 15px 20px; /* More padding */
+      border-radius: 8px; /* Rounded corners */
+      text-align: center;
+      font-size: 0.95em;
+      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .feedback-success {
+      background-color: var(--success-bg);
+      color: var(--success-text);
+      border: 1px solid var(--success-text);
+    }
+    .feedback-error {
+      background-color: var(--error-bg);
+      color: var(--error-text);
+      border: 1px solid var(--error-text);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="mdl-card mdl-shadow--2dp">
+    <div class="mdl-card__title">
+      <h2 class="mdl-card__title-text">Log New Job</h2>
+    </div>
+    <div class="mdl-card__supporting-text">
+      <form id="logEditForm">
+        
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+          <input class="mdl-textfield__input" type="text" id="schoolFilterInput">
+          <label class="mdl-textfield__label" for="schoolFilterInput">Filter School Code + Name</label>
+        </div>
+        <div class="mdl-selectfield">
+          <select id="schoolSelect" name="school" required>
+            <option value="">Select a school...</option>
+          </select>
+          <label for="schoolSelect" class="mdl-textfield__label">School Code + Name</label>
+        </div>
+
+        
+        <div class="mdl-selectfield">
+          <select id="editorSelect" name="editor" required>
+            <option value="">Select an editor...</option>
+          </select>
+          <label for="editorSelect" class="mdl-textfield__label">Editor</label>
+        </div>
+
+        
+        <div class="mdl-selectfield">
+          <select id="styleSelect" name="style" required>
+            <option value="">Select a style...</option>
+          </select>
+          <label for="styleSelect" class="mdl-textfield__label">Shoot Style</label>
+        </div>
+
+        
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+          <input class="mdl-textfield__input" type="number" pattern="-?[0-9]*(\.[0-9]+)?" id="classesInput" name="classes" min="1" value="1" required>
+          <label class="mdl-textfield__label" for="classesInput">Number of Classes</label>
+          <span class="mdl-textfield__error">Input is not a number!</span>
+        </div>
+
+        
+        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="reeditCheckbox">
+          <input type="checkbox" id="reeditCheckbox" class="mdl-checkbox__input" name="reedit">
+          <span class="mdl-checkbox__label">Re-edit?</span>
+        </label>
+
+        <div class="button-bar">
+          <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
+            Log New Job
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="activeJobDisplay" class="mdl-card mdl-shadow--2dp">
+    <div class="mdl-card__title">
+      <h2 class="mdl-card__title-text">Active Job Selection</h2>
+    </div>
+    <div class="mdl-card__supporting-text">
+        <p id="activeJobMessage">No active job selected. Select one below to manage:</p>
+        <div class="mdl-selectfield">
+            <select id="activeJobSelect">
+                <option value="">No active jobs</option>
+            </select>
+            <label for="activeJobSelect" class="mdl-textfield__label">Select Active Job</label>
+        </div>
+        
+        <div id="currentJobDetails" class="hidden">
+            <p><strong>School:</strong> <span id="activeJobSchool"></span></p>
+            <p><strong>Editor:</strong> <span id="activeJobEditor"></span></p>
+            <p id="activeJobStatus"></p> <p>Total Paused Duration: <span id="totalPausedDurationDisplay">00:00</span></p> <p>Work Time Elapsed:</p> 
+            <span id="elapsedTime" class="timer">00:00:00</span>
+            <div class="button-bar">
+              <button id="pauseJobButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--pause mdl-js-ripple-effect hidden">
+                Pause Job
+              </button>
+              <button id="resumeJobButton" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect hidden">
+                Resume Job
+              </button>
+              <button id="endJobButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect hidden">
+                End Job
+              </button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <div id="feedback" class="hidden"></div>
+
+  <script>
+    let activeJob = null; // Stores the currently active job's details
+    let allOpenJobs = []; // Stores all fetched open jobs (includes paused now)
+    let timerInterval = null; // Stores the interval ID for the timer
+
+    // Utility function to format milliseconds to hh:mm:ss
+    function formatMillisecondsToHMS(milliseconds) {
+        if (milliseconds < 0 || isNaN(milliseconds)) milliseconds = 0; // Handle negative or NaN
+        const totalSeconds = Math.floor(milliseconds / 1000);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    // NEW Utility function to format milliseconds to HH:MM
+    function formatMillisecondsToHM(milliseconds) {
+        if (milliseconds < 0 || isNaN(milliseconds)) milliseconds = 0;
+        const totalMinutes = Math.floor(milliseconds / (1000 * 60));
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    }
+
+    // Calculates the *actual work time* elapsed for the active job
+    function calculateElapsedWorkTime(job) {
+      if (!job || !job.startTime) {
+        return 0;
+      }
+
+      const currentTime = new Date().getTime();
+      let totalElapsed = currentTime - job.startTime;
+      let effectivePausedDuration = job.totalPausedDuration || 0; // Initialize with saved paused duration
+
+      if (job.status === 'Paused' && job.pauseStartTime) {
+        // If currently paused, add the duration of the current pause segment
+        effectivePausedDuration += (currentTime - job.pauseStartTime);
+      }
+      
+      // Actual work time is total elapsed minus total effective paused time
+      let actualWorkTime = totalElapsed - effectivePausedDuration;
+      return Math.max(0, actualWorkTime); // Ensure it's not negative
+    }
+
+    // Starts/updates the timer display for the active job
+    function startTimerDisplay() {
+      if (timerInterval) clearInterval(timerInterval); // Clear any existing timer
+
+      if (activeJob && (activeJob.status === 'Open' || activeJob.status === 'Paused')) {
+        const elapsedTimeSpan = document.getElementById('elapsedTime');
+        const totalPausedDurationSpan = document.getElementById('totalPausedDurationDisplay');
+        
+        const updateTimer = () => {
+          if (activeJob.status === 'Open') {
+            const elapsed = calculateElapsedWorkTime(activeJob);
+            elapsedTimeSpan.textContent = formatMillisecondsToHMS(elapsed);
+          } else if (activeJob.status === 'Paused') {
+            // When paused, timer should show the time *up to the point of pausing*
+            const elapsed = calculateElapsedWorkTime(activeJob);
+            elapsedTimeSpan.textContent = formatMillisecondsToHMS(elapsed);
+          }
+          // Always update total paused duration
+          totalPausedDurationSpan.textContent = formatMillisecondsToHM(activeJob.totalPausedDuration);
+        };
+
+        updateTimer(); // Initial update
+        // Only update every second if the job is 'Open'
+        if (activeJob.status === 'Open') {
+          timerInterval = setInterval(updateTimer, 1000);
+        } else {
+            // If paused, update once and then stop the timer, as work time is static
+            // The totalPausedDurationDisplay will still update if the job is resumed and paused again.
+            // No need for a separate interval for totalPausedDurationDisplay as it only changes on pause/resume events.
+        }
+      } else {
+        document.getElementById('elapsedTime').textContent = '00:00:00';
+        document.getElementById('totalPausedDurationDisplay').textContent = '00:00';
+      }
+    }
+
+    // Displays feedback messages to the user
+    function showFeedback(message, isSuccess = true) {
+      const feedbackDiv = document.getElementById('feedback');
+      feedbackDiv.textContent = message;
+      feedbackDiv.classList.remove('hidden', 'feedback-success', 'feedback-error');
+      feedbackDiv.classList.add(isSuccess ? 'feedback-success' : 'feedback-error');
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+          feedbackDiv.classList.add('hidden');
+      }, 5000);
+    }
+
+    // Handles the logging of a new job
+    document.getElementById('logEditForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = {
+        school: form.school.value,
+        editor: form.editor.value,
+        style: form.style.value,
+        classes: form.classes.value,
+        reedit: form.reedit.checked
+      };
+
+      if (!formData.school || !formData.editor || !formData.style || !formData.classes) {
+          showFeedback('Please fill in all required fields.', false);
+          return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(rowNum) {
+          showFeedback(`Job for ${formData.school} logged successfully (Row ${rowNum}).`, true);
+          // Directly set the newly logged job as the active one
+          activeJob = {
+            row: rowNum, 
+            school: formData.school,
+            editor: formData.editor,
+            status: 'Open', // Newly logged job is always 'Open'
+            startTime: new Date().getTime(),
+            pauseStartTime: null, // No pause time initially
+            totalPausedDuration: 0 // No paused duration initially
+          };
+          loadOpenJobsIntoSelect(); // Reload the dropdown to include the new job
+          updateSidebarDisplay(); // Update display with newly active job
+          
+          // Clear form fields
+          form.school.value = ''; // Reset school selection
+          document.getElementById('schoolFilterInput').value = ''; // Clear filter
+          filterSchools(); // Re-apply filter to show all schools (shows all options)
+          form.classes.value = 1;
+          form.reedit.checked = false;
+          // Important for MDL: Ensure labels are reset
+          if (form.school.parentElement && form.school.parentElement.MaterialSelectfield) {
+              form.school.parentElement.MaterialSelectfield.checkDirty();
+          }
+        })
+        .withFailureHandler(function(error) {
+          showFeedback(`Error logging job: ${error.message}`, false);
+          console.error('Error logging job:', error);
+        })
+        .logEdit(formData);
+    });
+
+    // Handles ending the active job
+    document.getElementById('endJobButton').addEventListener('click', function() {
+      if (!activeJob) {
+        showFeedback('No active job selected to end.', false);
+        return;
+      }
+
+      if (!confirm(`Are you sure you want to END the job for ${activeJob.school} by ${activeJob.editor}?`)) {
+          return; // User cancelled
+      }
+
+      google.script.run
+        .withSuccessHandler(function(response) {
+          showFeedback(response, true);
+          activeJob = null; // Clear active job as it's completed
+          loadOpenJobsIntoSelect(); // Reload the dropdown after ending a job
+        })
+        .withFailureHandler(function(error) {
+          showFeedback(`Error ending job: ${error.message}`, false);
+          console.error('Error ending job:', error);
+        })
+        .endJob(activeJob.row); // Pass the row number of the job to end
+    });
+
+    // Handles pausing the active job
+    document.getElementById('pauseJobButton').addEventListener('click', function() {
+      if (!activeJob) {
+        showFeedback('No active job selected to pause.', false);
+        return;
+      }
+      if (activeJob.status !== 'Open') {
+        showFeedback(`Job is not in 'Open' status, cannot pause. Current status: ${activeJob.status}`, false);
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(response) {
+          showFeedback(response, true);
+          activeJob.status = 'Paused'; // Update client-side status
+          activeJob.pauseStartTime = new Date().getTime(); // Set pause start time
+          updateSidebarDisplay(); // Update UI
+          loadOpenJobsIntoSelect(); // Reload dropdown to update job status there
+        })
+        .withFailureHandler(function(error) {
+          showFeedback(`Error pausing job: ${error.message}`, false);
+          console.error('Error pausing job:', error);
+        })
+        .pauseJob(activeJob.row);
+    });
+
+    // Handles resuming a paused job
+    document.getElementById('resumeJobButton').addEventListener('click', function() {
+      if (!activeJob) {
+        showFeedback('No active job selected to resume.', false);
+        return;
+      }
+      if (activeJob.status !== 'Paused') {
+        showFeedback(`Job is not in 'Paused' status, cannot resume. Current status: ${activeJob.status}`, false);
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(response) {
+          showFeedback(response, true);
+          // Recalculate totalPausedDuration client-side for immediate UI update
+          if (activeJob.pauseStartTime) {
+            const currentPauseSegment = new Date().getTime() - activeJob.pauseStartTime;
+            activeJob.totalPausedDuration = (activeJob.totalPausedDuration || 0) + currentPauseSegment;
+          }
+          activeJob.status = 'Open'; // Update client-side status
+          activeJob.pauseStartTime = null; // Clear pause start time
+          updateSidebarDisplay(); // Update UI
+          loadOpenJobsIntoSelect(); // Reload dropdown to update job status there
+        })
+        .withFailureHandler(function(error) {
+          showFeedback(`Error resuming job: ${error.message}`, false);
+          console.error('Error resuming job:', error);
+        })
+        .resumeJob(activeJob.row);
+    });
+
+
+    // Function to load open/paused jobs into the select dropdown
+    function loadOpenJobsIntoSelect() {
+        google.script.run
+            .withSuccessHandler(function(openJobsFromServer) {
+                allOpenJobs = openJobsFromServer; // Store all active jobs
+                const activeJobSelect = document.getElementById('activeJobSelect');
+                activeJobSelect.innerHTML = ''; // Clear existing options
+
+                if (allOpenJobs.length === 0) {
+                    const option = document.createElement('option');
+                    option.value = "";
+                    option.textContent = "No active jobs";
+                    activeJobSelect.appendChild(option);
+                    activeJob = null; // No active jobs, so clear current selection
+                } else {
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = "";
+                    defaultOption.textContent = "Select an active job...";
+                    activeJobSelect.appendChild(defaultOption);
+
+                    allOpenJobs.forEach((job, index) => {
+                        const option = document.createElement('option');
+                        option.value = index; // Use index in array as value for easy lookup
+                        option.textContent = `${job.school} by ${job.editor} (${job.status})`;
+                        if (job.status === 'Paused') {
+                            option.style.fontStyle = 'italic'; // Italicize paused jobs
+                            option.style.color = 'var(--text-medium)';
+                        }
+                        activeJobSelect.appendChild(option);
+                    });
+                    
+                    // Attempt to pre-select the current active job if it's still in the list
+                    if (activeJob) {
+                        const existingIndex = allOpenJobs.findIndex(job => job.row === activeJob.row);
+                        if (existingIndex !== -1) {
+                            activeJob = allOpenJobs[existingIndex]; // Update activeJob with fresh data from server
+                            activeJobSelect.value = existingIndex.toString();
+                        } else {
+                            // If activeJob is no longer in the list (e.g., just ended), clear selection
+                            activeJob = null;
+                            activeJobSelect.value = "";
+                        }
+                    } else {
+                         activeJobSelect.value = ""; // Ensure nothing is pre-selected if no active job
+                    }
+                }
+                // Important for MDL: Refresh the display of the select field's label
+                if (activeJobSelect.parentElement && activeJobSelect.parentElement.MaterialSelectfield) {
+                    activeJobSelect.parentElement.MaterialSelectfield.checkDirty();
+                } else if (typeof componentHandler !== 'undefined') {
+                    componentHandler.upgradeElement(activeJobSelect.parentElement);
+                }
+                updateSidebarDisplay(); // Call this to update the timer and details section
+            })
+            .withFailureHandler(function(error) {
+                console.error('Error fetching open jobs for select:', error.message);
+                showFeedback('Could not load active jobs: ' + error.message, false);
+                activeJob = null; // Clear active job state on error
+                updateSidebarDisplay(); // Ensure display is updated to reflect no job
+            })
+            .getOpenJobs();
+    }
+
+    // Handles selection change in the active jobs dropdown
+    document.getElementById('activeJobSelect').addEventListener('change', function() {
+        const selectedIndex = this.value;
+        if (selectedIndex !== "") {
+            activeJob = allOpenJobs[parseInt(selectedIndex)];
+        } else {
+            activeJob = null;
+        }
+        updateSidebarDisplay();
+    });
+
+    // Updates the sidebar display based on active job status
+    function updateSidebarDisplay() {
+      const currentJobDetailsDiv = document.getElementById('currentJobDetails');
+      const activeJobMessageP = document.getElementById('activeJobMessage');
+      const activeJobStatusP = document.getElementById('activeJobStatus');
+      const totalPausedDurationSpan = document.getElementById('totalPausedDurationDisplay'); // Get the new span
+      const pauseButton = document.getElementById('pauseJobButton');
+      const resumeButton = document.getElementById('resumeJobButton');
+      const endButton = document.getElementById('endJobButton');
+
+      if (activeJob) {
+        activeJobMessageP.classList.add('hidden');
+        currentJobDetailsDiv.classList.remove('hidden');
+        document.getElementById('activeJobSchool').textContent = activeJob.school;
+        document.getElementById('activeJobEditor').textContent = activeJob.editor;
+        
+        activeJobStatusP.textContent = `Status: ${activeJob.status}`;
+        activeJobStatusP.className = ''; // Clear existing classes
+        activeJobStatusP.classList.add('status-' + activeJob.status.toLowerCase()); // Add status class
+
+        totalPausedDurationSpan.textContent = formatMillisecondsToHM(activeJob.totalPausedDuration); // Set initial paused duration
+
+        // Adjust button visibility based on status
+        endButton.classList.remove('hidden'); // End button is always visible for active jobs
+
+        if (activeJob.status === 'Open') {
+          pauseButton.classList.remove('hidden');
+          resumeButton.classList.add('hidden');
+        } else if (activeJob.status === 'Paused') {
+          pauseButton.classList.add('hidden');
+          resumeButton.classList.remove('hidden');
+        } else { // Should not happen for active jobs, but as fallback
+          pauseButton.classList.add('hidden');
+          resumeButton.classList.add('hidden');
+        }
+        
+        startTimerDisplay(); // Start/restart timer based on new status
+      } else {
+        if (timerInterval) clearInterval(timerInterval); // Stop timer
+        document.getElementById('elapsedTime').textContent = '00:00:00';
+        totalPausedDurationSpan.textContent = '00:00'; // Reset paused duration display
+        activeJobMessageP.classList.remove('hidden');
+        currentJobDetailsDiv.classList.add('hidden');
+        pauseButton.classList.add('hidden');
+        resumeButton.classList.add('hidden');
+        endButton.classList.add('hidden');
+      }
+    }
+
+    // This part is the same as before for filtering schools.
+    let allSchools = []; // Stores all schools for filtering
+    function filterSchools() {
+        const filterInput = document.getElementById('schoolFilterInput').value.toLowerCase();
+        const schoolSelect = document.getElementById('schoolSelect');
+        schoolSelect.innerHTML = ''; // Clear current options
+
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select a school...';
+        schoolSelect.appendChild(defaultOption);
+
+        const filteredSchools = allSchools.filter(school => school.toLowerCase().includes(filterInput));
+        filteredSchools.forEach(school => {
+            const option = document.createElement('option');
+            option.value = school;
+            option.textContent = school;
+            schoolSelect.appendChild(option);
+        });
+        
+        if(filterInput && filteredSchools.length > 0) {
+            if (!filteredSchools.includes(schoolSelect.value) && schoolSelect.value !== '') { 
+                schoolSelect.value = filteredSchools[0];
+            } else if (schoolSelect.value === '' && filteredSchools.length > 0) { 
+                schoolSelect.value = filteredSchools[0];
+            }
+        }
+        else if (!filterInput) { 
+            schoolSelect.value = '';
+        }
+        if (schoolSelect.parentElement && schoolSelect.parentElement.MaterialSelectfield) {
+            schoolSelect.parentElement.MaterialSelectfield.checkDirty();
+        } else if (typeof componentHandler !== 'undefined') { 
+            componentHandler.upgradeElement(schoolSelect.parentElement);
+        }
+    }
+
+
+    // On load, populate dropdowns and check for an active job
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof componentHandler !== 'undefined') {
+          componentHandler.upgradeDom();
+      }
+
+      google.script.run.withSuccessHandler(function(schools) {
+        allSchools = schools;
+        filterSchools();
+      }).getSchoolsList();
+
+      document.getElementById('schoolFilterInput').addEventListener('input', filterSchools);
+
+      google.script.run.withSuccessHandler(function(editors) {
+        const select = document.getElementById('editorSelect');
+        select.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select an editor...';
+        select.appendChild(defaultOption);
+        editors.forEach(editor => {
+          const option = document.createElement('option');
+          option.value = editor;
+          option.textContent = editor;
+          select.appendChild(option);
+        });
+        if (select.parentElement && select.parentElement.MaterialSelectfield) {
+            select.parentElement.MaterialSelectfield.checkDirty();
+        } else if (typeof componentHandler !== 'undefined') {
+            componentHandler.upgradeElement(select.parentElement);
+        }
+      }).getEditorsList();
+
+      google.script.run.withSuccessHandler(function(styles) {
+        const select = document.getElementById('styleSelect');
+        select.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select a style...';
+        select.appendChild(defaultOption);
+        styles.forEach(style => {
+          const option = document.createElement('option');
+          option.value = style;
+          option.textContent = style;
+          select.appendChild(option);
+        });
+        if (select.parentElement && select.parentElement.MaterialSelectfield) {
+            select.parentElement.MaterialSelectfield.checkDirty();
+        } else if (typeof componentHandler !== 'undefined') {
+            componentHandler.upgradeElement(select.parentElement);
+        }
+      }).getShootStylesList();
+
+      loadOpenJobsIntoSelect(); // Load active jobs including paused ones
+    });
+  </script>
+</body>
+</html>
